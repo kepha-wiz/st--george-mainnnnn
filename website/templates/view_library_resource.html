@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ resource.title }} - St. George Biology Class</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+   <link rel="icon" href="static/logo1.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        
+        /* Header Styles */
+        .header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            color: #a0c4ff;
+        }
+        
+        .back-button {
+            padding: 0.7rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .back-button i {
+            margin-right: 0.5rem;
+        }
+        
+        /* Resource Info */
+        .resource-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .resource-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        
+        .resource-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #a0c4ff;
+        }
+        
+        .resource-meta-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .resource-meta-item i {
+            margin-right: 0.5rem;
+        }
+        
+        /* Content Viewer */
+        .content-viewer {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-height: 500px;
+        }
+        
+        .pdf-container {
+            width: 100%;
+            position: relative;
+        }
+        
+        .pdf-canvas {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: white;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .pdf-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .pdf-controls button {
+            background: rgba(74, 111, 165, 0.7);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pdf-controls button:hover {
+            background: rgba(74, 111, 165, 0.9);
+        }
+        
+        .pdf-controls button:disabled {
+            background: rgba(74, 111, 165, 0.3);
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            color: white;
+        }
+        
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .image-viewer {
+            max-width: 100%;
+            display: block;
+            margin: 0 auto;
+            border-radius: 10px;
+        }
+        
+        .video-viewer {
+            width: 100%;
+            max-height: 600px;
+            border-radius: 10px;
+        }
+        
+        .audio-viewer {
+            width: 100%;
+            margin: 2rem auto;
+            display: block;
+        }
+        
+        .text-viewer {
+            background: white;
+            color: black;
+            padding: 2rem;
+            border-radius: 10px;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .unsupported-message {
+            text-align: center;
+            padding: 3rem;
+            color: #a0c4ff;
+        }
+        
+        .unsupported-message i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #a0c4ff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* AI Summary */
+        .ai-summary {
+            background: rgba(74, 111, 165, 0.1);
+            border-left: 3px solid #4a6fa5;
+            padding: 1.5rem;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 2rem;
+        }
+        
+        .ai-summary-title {
+            display: flex;
+            align-items: center;
+            color: #a0c4ff;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .ai-summary-title i {
+            margin-right: 0.5rem;
+        }
+        
+        .ai-summary-content {
+            color: #e0e0e0;
+            line-height: 1.5;
+        }
+        
+        /* Tags */
+        .resource-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .resource-tag {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #a0c4ff;
+            font-size: 0.9rem;
+        }
+        
+        /* PDF Fallback */
+        .pdf-fallback {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .pdf-fallback a {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.7rem 1.5rem;
+            background: linear-gradient(90deg, #4a6fa5, #2c4c7c);
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .pdf-fallback a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 111, 165, 0.4);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .pdf-controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ resource.title }}</h1>
+            <a href="{{ url_for('views.public_library') }}" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back to Library
+            </a>
+        </div>
+        
+        <div class="resource-info">
+            <h2 class="resource-title">{{ resource.title }}</h2>
+            <div class="resource-meta">
+                <div class="resource-meta-item">
+                    <i class="fas fa-file"></i> {{ resource.type }}
+                </div>
+                <div class="resource-meta-item">
+                    <i class="fas fa-user"></i> {{ resource.author }}
+                </div>
+                <div class="resource-meta-item">
+                    <i class="fas fa-eye"></i> {{ resource.downloads }} views
+                </div>
+                <div class="resource-meta-item">
+                    <i class="fas fa-calendar"></i> {{ resource.date_added }}
+                </div>
+                <div class="resource-meta-item">
+                    <i class="fas fa-star"></i> {{ "%.1f"|format(resource.rating) if resource.rating else "N/A" }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-viewer">
+            {% if file_extension == 'pdf' %}
+            <div class="loading-spinner" id="pdfLoading">
+                <div class="spinner"></div>
+            </div>
+            <div id="pdfContainer" style="display: none;">
+                <div class="pdf-controls">
+                    <button id="prevPage"><i class="fas fa-chevron-left"></i> Previous</button>
+                    <div class="page-info">
+                        Page: <span id="page_num">0</span> / <span id="page_count">0</span>
+                    </div>
+                    <button id="nextPage">Next <i class="fas fa-chevron-right"></i></button>
+                    <div class="zoom-controls">
+                        <button id="zoomOut"><i class="fas fa-search-minus"></i></button>
+                        <button id="zoomFit" title="Fit to width">Fit</button>
+                        <button id="zoomIn"><i class="fas fa-search-plus"></i></button>
+                    </div>
+                </div>
+                <div class="pdf-container">
+                    <canvas id="pdfCanvas" class="pdf-canvas"></canvas>
+                </div>
+            </div>
+            <div class="pdf-fallback" id="pdfFallback" style="display: none;">
+                <i class="fas fa-file-pdf" style="font-size: 3rem; color: #e74c3c; margin-bottom: 1rem;"></i>
+                <h3>Unable to display PDF in browser</h3>
+                <p>Your browser may not support inline PDF viewing. You can try opening the PDF in a new tab.</p>
+                <a href="{{ url_for('views.serve_library_file', resource_id=resource.id) }}" target="_blank">Open PDF in New Tab</a>
+            </div>
+            {% elif file_extension in ['jpg', 'jpeg', 'png', 'gif'] %}
+            <img src="{{ url_for('views.serve_library_file', resource_id=resource.id) }}" alt="{{ resource.title }}" class="image-viewer">
+            {% elif file_extension in ['mp4', 'webm', 'ogg'] %}
+            <video src="{{ url_for('views.serve_library_file', resource_id=resource.id) }}" controls class="video-viewer"></video>
+            {% elif file_extension in ['mp3', 'wav', 'ogg'] %}
+            <audio src="{{ url_for('views.serve_library_file', resource_id=resource.id) }}" controls class="audio-viewer"></audio>
+            {% elif file_extension in ['txt', 'md', 'csv'] %}
+            <div class="loading-spinner" id="textLoading">
+                <div class="spinner"></div>
+            </div>
+            <div id="textContent" class="text-viewer" style="display: none;"></div>
+            {% else %}
+            <div class="unsupported-message">
+                <i class="fas fa-file"></i>
+                <h3>Preview Not Available</h3>
+                <p>This file type ({{ file_extension }}) cannot be previewed in the browser.</p>
+                <p>You can download the file to view it.</p>
+                <a href="{{ url_for('views.serve_library_file', resource_id=resource.id) }}" class="back-button" style="margin-top: 1rem; display: inline-flex;">
+                    <i class="fas fa-download"></i> Download File
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="ai-summary">
+            <div class="ai-summary-title">
+                <i class="fas fa-brain"></i> AI Summary
+            </div>
+            <div class="ai-summary-content">
+                {{ resource.ai_summary or "No AI summary available." }}
+            </div>
+        </div>
+        
+        <div class="resource-tags">
+            {% for tag in resource.tags %}
+            <div class="resource-tag">{{ tag }}</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        // Set the worker source for PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        
+        $(document).ready(function() {
+            // PDF Viewer
+            {% if file_extension == 'pdf' %}
+            const pdfLoading = document.getElementById('pdfLoading');
+            const pdfContainer = document.getElementById('pdfContainer');
+            const pdfFallback = document.getElementById('pdfFallback');
+            const canvas = document.getElementById('pdfCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Get the URL of the PDF using our new route
+            const pdfUrl = "{{ url_for('views.serve_library_file', resource_id=resource.id) }}";
+            
+            // PDF rendering variables
+            let pdfDoc = null;
+            let pageNum = 1;
+            let pageRendering = false;
+            let pageNumPending = null;
+            let scale = 1.5;
+            
+            // Function to render page
+            function renderPage(num) {
+                pageRendering = true;
+                
+                // Get page
+                pdfDoc.getPage(num).then(function(page) {
+                    const viewport = page.getViewport({scale: scale});
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    
+                    // Render PDF page into canvas context
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    const renderTask = page.render(renderContext);
+                    
+                    // Wait for rendering to finish
+                    renderTask.promise.then(function() {
+                        pageRendering = false;
+                        if (pageNumPending !== null) {
+                            // New page rendering is pending
+                            renderPage(pageNumPending);
+                            pageNumPending = null;
+                        }
+                    });
+                });
+                
+                // Update page counters
+                document.getElementById('page_num').textContent = num;
+            }
+            
+            // Function to queue render page
+            function queueRenderPage(num) {
+                if (pageRendering) {
+                    pageNumPending = num;
+                } else {
+                    renderPage(num);
+                }
+            }
+            
+            // Function for previous page
+            function onPrevPage() {
+                if (pageNum <= 1) {
+                    return;
+                }
+                pageNum--;
+                queueRenderPage(pageNum);
+            }
+            
+            // Function for next page
+            function onNextPage() {
+                if (pageNum >= pdfDoc.numPages) {
+                    return;
+                }
+                pageNum++;
+                queueRenderPage(pageNum);
+            }
+            
+            // Function for zoom in
+            function onZoomIn() {
+                scale += 0.25;
+                queueRenderPage(pageNum);
+            }
+            
+            // Function for zoom out
+            function onZoomOut() {
+                if (scale <= 0.5) {
+                    return;
+                }
+                scale -= 0.25;
+                queueRenderPage(pageNum);
+            }
+            
+            // Function for fit to width
+            function onZoomFit() {
+                if (!pdfDoc) return;
+                
+                pdfDoc.getPage(pageNum).then(function(page) {
+                    const viewport = page.getViewport({scale: 1.0});
+                    const containerWidth = canvas.parentElement.clientWidth;
+                    scale = containerWidth / viewport.width;
+                    queueRenderPage(pageNum);
+                });
+            }
+            
+            // Set up event listeners
+            document.getElementById('prevPage').addEventListener('click', onPrevPage);
+            document.getElementById('nextPage').addEventListener('click', onNextPage);
+            document.getElementById('zoomIn').addEventListener('click', onZoomIn);
+            document.getElementById('zoomOut').addEventListener('click', onZoomOut);
+            document.getElementById('zoomFit').addEventListener('click', onZoomFit);
+            
+            // Load PDF document
+            pdfjsLib.getDocument({
+                url: pdfUrl,
+                cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/cmaps/',
+                cMapPacked: true
+            }).promise.then(function(pdfDoc_) {
+                pdfDoc = pdfDoc_;
+                document.getElementById('page_count').textContent = pdfDoc.numPages;
+                
+                // Initial/first page rendering
+                renderPage(pageNum);
+                
+                // Hide loading spinner and show PDF container
+                pdfLoading.style.display = 'none';
+                pdfContainer.style.display = 'block';
+            }).catch(function(error) {
+                // Hide loading spinner and show fallback
+                pdfLoading.style.display = 'none';
+                pdfFallback.style.display = 'block';
+                
+                console.error('Error loading PDF:', error);
+            });
+            {% endif %}
+            
+            // Text File Viewer
+            {% if file_extension in ['txt', 'md', 'csv'] %}
+            $.ajax({
+                url: "{{ url_for('views.serve_library_file', resource_id=resource.id) }}",
+                dataType: 'text',
+                success: function(data) {
+                    // Hide loading spinner
+                    $('#textLoading').hide();
+                    
+                    // Show text content
+                    $('#textContent').text(data).show();
+                },
+                error: function() {
+                    // Hide loading spinner
+                    $('#textLoading').hide();
+                    
+                    // Show error message
+                    $('#textContent').html('<p>Error loading text file.</p>').show();
+                }
+            });
+            {% endif %}
+        });
+    </script>
+</body>
+</html>
