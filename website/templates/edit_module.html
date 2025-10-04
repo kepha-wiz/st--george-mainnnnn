@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Module - {{ course.course_code }}</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="icon" href="static/logo1.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                        url('https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #222;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Biology Background Elements */
+        .bio-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bio-element {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+        
+        .cell {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #8bc34a, #4caf50);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        .dna {
+            width: 30px;
+            height: 100px;
+            background: linear-gradient(to bottom, #4caf50, #8bc34a, #4caf50);
+            border-radius: 15px;
+            transform: rotate(45deg);
+        }
+        
+        .leaf {
+            width: 40px;
+            height: 60px;
+            background: #8bc34a;
+            border-radius: 0 100% 0 100%;
+            transform: rotate(45deg);
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.1;
+            }
+            50% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0.1;
+            }
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #e0e0e0;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Form Container */
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            padding: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #4CAF50, #388E3C);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #eeeeee;
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+        }
+        
+        .breadcrumb a {
+            color: #e0e0e0;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .breadcrumb span {
+            margin: 0 0.5rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Biology-themed background elements -->
+    <div class="bio-bg">
+        <div class="bio-element cell" style="top: 10%; left: 5%; animation-delay: 0s;"></div>
+        <div class="bio-element dna" style="top: 20%; left: 15%; animation-delay: 2s;"></div>
+        <div class="bio-element leaf" style="top: 30%; left: 25%; animation-delay: 4s;"></div>
+        <div class="bio-element cell" style="top: 40%; left: 35%; animation-delay: 6s;"></div>
+        <div class="bio-element dna" style="top: 50%; left: 45%; animation-delay: 8s;"></div>
+        <div class="bio-element leaf" style="top: 60%; left: 55%; animation-delay: 10s;"></div>
+        <div class="bio-element cell" style="top: 70%; left: 65%; animation-delay: 12s;"></div>
+        <div class="bio-element dna" style="top: 80%; left: 75%; animation-delay: 14s;"></div>
+        <div class="bio-element leaf" style="top: 90%; left: 85%; animation-delay: 16s;"></div>
+        <div class="bio-element cell" style="top: 15%; left: 95%; animation-delay: 18s;"></div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Edit Module</h1>
+            <p>Update the module details for {{ course.course_code }}: {{ course.course_name }}</p>
+        </div>
+        
+        <div class="breadcrumb">
+            <a href="{{ url_for('views.home') }}">Home</a>
+            <span>></span>
+            <a href="{{ url_for('views.course_page', course_id=course.id) }}">{{ course.course_code }}</a>
+            <span>></span>
+            <a href="{{ url_for('views.course_structure', course_id=course.id) }}">Course Structure</a>
+            <span>></span>
+            <span>Edit Module</span>
+        </div>
+        
+        <div class="form-container">
+            <form method="POST" action="{{ url_for('views.edit_module', course_id=course.id, module_id=module.id) }}">
+                <div class="form-group">
+                    <label for="title">Module Title</label>
+                    <input type="text" class="form-control" id="title" name="title" value="{{ module.title }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="4">{{ module.description }}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="order">Order</label>
+                    <input type="number" class="form-control" id="order" name="order" value="{{ module.order }}" min="0">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Module
+                    </button>
+                    <a href="{{ url_for('views.course_structure', course_id=course.id) }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            // Add dynamic biology elements
+            function createBioElement() {
+                const types = ['cell', 'dna', 'leaf'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                const element = document.createElement('div');
+                element.className = `bio-element ${type}`;
+                element.style.top = Math.random() * 100 + '%';
+                element.style.left = Math.random() * 100 + '%';
+                element.style.animationDelay = Math.random() * 5 + 's';
+                element.style.animationDuration = (15 + Math.random() * 10) + 's';
+                
+                document.querySelector('.bio-bg').appendChild(element);
+                
+                setTimeout(() => {
+                    element.remove();
+                }, 25000);
+            }
+            
+            // Create new bio elements periodically
+            setInterval(createBioElement, 3000);
+        });
+    </script>
+</body>
+</html>

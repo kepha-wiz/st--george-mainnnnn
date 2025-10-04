@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ topic.name }} - St. George Biology Class</title>
+    <link rel="icon" href="static/logo1.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2E7D32;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .subtopic {
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            transition: transform 0.2s;
+        }
+        .subtopic:hover {
+            transform: translateX(5px);
+        }
+        .subtopic h3 {
+            margin-top: 0;
+            color: #2E7D32;
+        }
+        .subtopic p {
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .subtopic a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .subtopic a:hover {
+            text-decoration: underline;
+        }
+        .learning-outcomes {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .learning-outcomes h4 {
+            color: #388E3C;
+            margin-bottom: 10px;
+        }
+        .outcome {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        .outcome:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+        }
+        .outcome.k:before {
+            content: "K: ";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .outcome.u:before {
+            content: "U: ";
+            color: #FF9800;
+            font-weight: bold;
+        }
+        .outcome.s:before {
+            content: "S: ";
+            color: #2196F3;
+            font-weight: bold;
+        }
+        .outcome.gs:before {
+            content: "GS: ";
+            color: #9C27B0;
+            font-weight: bold;
+        }
+        .outcome.va:before {
+            content: "V/A: ";
+            color: #F44336;
+            font-weight: bold;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .term-badge {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('views.curriculum') }}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Curriculum</a>
+        
+        <div class="term-badge">{{ topic.term }}</div>
+        <h1>{{ topic.order }}. {{ topic.name }}</h1>
+        <p>{{ topic.description }}</p>
+        
+        <h2>Subtopics</h2>
+        {% for subtopic in topic.subtopics|sort(attribute='order') %}
+            <div class="subtopic">
+                <h3>{{ subtopic.order }}. {{ subtopic.name }}</h3>
+                <p>{{ subtopic.description }}</p>
+                <a href="{{ url_for('views.subtopic_detail', subtopic_id=subtopic.id) }}">View Learning Outcomes <i class="fas fa-arrow-right"></i></a>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

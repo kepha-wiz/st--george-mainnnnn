@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subtopic.name }} - St. George Biology Class</title>
+   <link rel="icon" href="static/logo1.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2E7D32;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .topic-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .topic-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .learning-outcomes {
+            margin-top: 20px;
+        }
+        .learning-outcomes h2 {
+            color: #2E7D32;
+            margin-bottom: 15px;
+        }
+        .outcome {
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            position: relative;
+            padding-left: 50px;
+        }
+        .outcome h4 {
+            margin-top: 0;
+            color: #333;
+        }
+        .outcome p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .outcome .code {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+        .outcome .code.k {
+            background: #2196F3;
+            color: white;
+        }
+        .outcome .code.u {
+            background: #FF9800;
+            color: white;
+        }
+        .outcome .code.s {
+            background: #4CAF50;
+            color: white;
+        }
+        .outcome .code.gs {
+            background: #9C27B0;
+            color: white;
+        }
+        .outcome .code.va {
+            background: #F44336;
+            color: white;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .term-badge {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('views.topic_detail', topic_id=subtopic.topic.id) }}" class="back-link"><i class="fas fa-arrow-left"></i> Back to {{ subtopic.topic.name }}</a>
+        
+        <div class="term-badge">{{ subtopic.topic.term }}</div>
+        <h1>{{ subtopic.topic.order }}.{{ subtopic.order }} {{ subtopic.name }}</h1>
+        
+        <div class="topic-info">
+            <p><strong>Topic:</strong> {{ subtopic.topic.name }}</p>
+            <p><strong>Description:</strong> {{ subtopic.description }}</p>
+        </div>
+        
+        <div class="learning-outcomes">
+            <h2><i class="fas fa-tasks"></i> Learning Outcomes</h2>
+            {% for outcome in subtopic.learning_outcomes|sort(attribute='order') %}
+                <div class="outcome">
+                    <div class="code {{ outcome.code.lower() }}">{{ outcome.code }}</div>
+                    <h4>Learning Outcome {{ outcome.order }}</h4>
+                    <p>{{ outcome.description }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
